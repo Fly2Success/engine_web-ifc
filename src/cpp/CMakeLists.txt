@@ -132,8 +132,17 @@ if(EMSCRIPTEN)
 endif()
 
 if(NOT EMSCRIPTEN)
+	add_library(web-ifc-static STATIC ${WebIfcManager} ${WebIfcSchema} ${WebIfcParsing} ${WebIfcUtility} ${WebIfcGeometry})
+	target_include_directories(web-ifc-static
+		INTERFACE
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/geometry>
+		$<INSTALL_INTERFACE:${INSTALL_INCLUDE_DIR}>
+	)
+	param_setter(web-ifc-static)
+
 	# build parameters for web-ifc-test
-	add_executable(web-ifc-test ${WebIfcManager} ${WebIfcSchema} ${WebIfcParsing} ${WebIfcUtility} ${WebIfcGeometry} ${WebIfcTestSourceFiles})
+	add_executable(web-ifc-test ${WebIfcTestSourceFiles})
+	target_link_libraries(web-ifc-test web-ifc-static)
 	param_setter(web-ifc-test)
 	target_include_directories(web-ifc-test PUBLIC ${tinycpptest_SOURCE_DIR}/Sources)
 
@@ -141,7 +150,8 @@ if(NOT EMSCRIPTEN)
 	set_tests_properties(web-ifc-test PROPERTIES LABELS "web-ifc")
 
 	# build parameters for web-ifc in testing environment
-	add_executable(web-ifc ${WebIfcManager} ${WebIfcSchema} ${WebIfcParsing} ${WebIfcUtility} ${WebIfcGeometry} ${WebIfcTestingMain} "./test/io_helpers.cpp")
+	add_executable(web-ifc ${WebIfcTestingMain} "./test/io_helpers.cpp")
+	target_link_libraries(web-ifc web-ifc-static)
 	param_setter(web-ifc)
 	target_include_directories(web-ifc PUBLIC ${tinycpptest_SOURCE_DIR}/Sources)
 
