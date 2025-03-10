@@ -25,6 +25,8 @@ namespace webifc::geometry
   class booleanManager
   {
     public:
+      bool excludeExpensiveBoolMeshes;
+
       IfcGeometry BoolProcess(const std::vector<IfcGeometry> &firstGeoms, std::vector<IfcGeometry> &secondGeoms, std::string op);
     private:
       fuzzybools::Geometry convertToEngine(Geometry geom);
@@ -36,7 +38,17 @@ namespace webifc::geometry
   class IfcGeometryProcessor 
   {
       public:
-        IfcGeometryProcessor(const webifc::parsing::IfcLoader &loader,const webifc::schema::IfcSchemaManager &schemaManager,uint16_t circleSegments,bool coordinateToOrigin);
+        class fatbool_error : public std::runtime_error {
+        public:
+          template <typename ...Args>
+          fatbool_error(Args &&...args) :
+           std::runtime_error(std::forward<Args>(args)...) {
+          }
+        };
+
+        IfcGeometryProcessor(const webifc::parsing::IfcLoader &loader,const webifc::schema::IfcSchemaManager &schemaManager,uint16_t circleSegments,
+          bool coordinateToOrigin, bool excludeExpensiveBoolMeshes
+        );
         IfcGeometry &GetGeometry(uint32_t expressID);
         IfcGeometryLoader GetLoader() const;
         IfcFlatMesh GetFlatMesh(uint32_t expressID);
