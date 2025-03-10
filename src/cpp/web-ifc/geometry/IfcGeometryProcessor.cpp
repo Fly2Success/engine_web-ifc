@@ -20,11 +20,11 @@
 namespace webifc::geometry
 {
     IfcGeometryProcessor::IfcGeometryProcessor(const webifc::parsing::IfcLoader &loader, const webifc::schema::IfcSchemaManager &schemaManager, uint16_t circleSegments,
-        bool coordinateToOrigin, bool excludeExpensiveBoolMeshes
+        bool coordinateToOrigin, const std::optional<size_t> &optExcludeExpensiveBoolMeshes
     )
         : _geometryLoader(loader, schemaManager, circleSegments),
         _loader(loader),
-        boolEngine{.excludeExpensiveBoolMeshes = excludeExpensiveBoolMeshes},
+        boolEngine{.optExcludeExpensiveBoolMeshes = optExcludeExpensiveBoolMeshes},
         _schemaManager(schemaManager),
         _coordinateToOrigin(coordinateToOrigin),
         _circleSegments(circleSegments)
@@ -1807,10 +1807,13 @@ namespace webifc::geometry
 
                     if (op == "DIFFERENCE")
                     {
-                        if (excludeExpensiveBoolMeshes && firstOperator.numFaces >= 1000000) {
-                            std::stringstream ss;
-                            ss << "engine_web-ifc: COMPONENT GEOMETRY ABORTED BECAUSE OF TOO EXPENSIVE BOOLEAN DIFFERENCE, RESULT HAD " << result.numFaces << " FACES ON INTERRUPTION" << std::endl;
-                            throw IfcGeometryProcessor::fatbool_error(ss.str());
+                        if (optExcludeExpensiveBoolMeshes.has_value()) {
+                            auto faceCountThreshold = *optExcludeExpensiveBoolMeshes;
+                            if (firstOperator.numFaces > faceCountThreshold) {
+                                std::stringstream ss;
+                                ss << "engine_web-ifc: COMPONENT GEOMETRY ABORTED BECAUSE OF TOO EXPENSIVE BOOLEAN DIFFERENCE, RESULT HAD " << firstOperator.numFaces << " FACES ON INTERRUPTION" << std::endl;
+                                throw IfcGeometryProcessor::fatbool_error(ss.str());
+                            }
                         }
                         firstOperator = Subtract(firstOperator, secondOperator);
                     }

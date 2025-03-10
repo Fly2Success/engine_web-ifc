@@ -25,7 +25,7 @@ namespace webifc::geometry
   class booleanManager
   {
     public:
-      bool excludeExpensiveBoolMeshes;
+      std::optional<size_t> optExcludeExpensiveBoolMeshes;
 
       IfcGeometry BoolProcess(const std::vector<IfcGeometry> &firstGeoms, std::vector<IfcGeometry> &secondGeoms, std::string op);
     private:
@@ -47,7 +47,7 @@ namespace webifc::geometry
         };
 
         IfcGeometryProcessor(const webifc::parsing::IfcLoader &loader,const webifc::schema::IfcSchemaManager &schemaManager,uint16_t circleSegments,
-          bool coordinateToOrigin, bool excludeExpensiveBoolMeshes
+          bool coordinateToOrigin, const std::optional<size_t> &optExcludeExpensiveBoolMeshes
         );
         IfcGeometry &GetGeometry(uint32_t expressID);
         IfcGeometryLoader GetLoader() const;
