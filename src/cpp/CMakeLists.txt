@@ -76,7 +76,7 @@ function(PARAM_SETTER THE_EXECUTABLE)
 		target_compile_options(${THE_EXECUTABLE} PUBLIC "-Wextra")
 		target_compile_options(${THE_EXECUTABLE} PUBLIC "-Wpedantic")
 		target_compile_options(${THE_EXECUTABLE} PUBLIC "-pedantic")
-		target_compile_options(${THE_EXECUTABLE} PUBLIC "-std=c++20")
+		target_compile_options(${THE_EXECUTABLE} PUBLIC "-std=c++23")
 
 		if(EMSCRIPTEN)
 			target_compile_options(${THE_EXECUTABLE} PUBLIC "-fexperimental-library")
